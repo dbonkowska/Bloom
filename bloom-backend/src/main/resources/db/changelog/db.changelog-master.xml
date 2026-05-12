@@ -5,4 +5,6 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
+    <include file="db/changelog/changes/2026-05-11-create-activity.xml" relativeToChangelogFile="false"/>
+
 </databaseChangeLog>

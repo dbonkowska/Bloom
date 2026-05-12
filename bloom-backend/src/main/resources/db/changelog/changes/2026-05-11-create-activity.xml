@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="2026-05-11-create-activity" author="dbbon">
+        <createTable tableName="activity">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="duration_seconds" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="distance_meters" type="INTEGER"/>
+            <column name="avg_heart_rate" type="INTEGER"/>
+            <column name="max_heart_rate" type="INTEGER"/>
+            <column name="calories" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
