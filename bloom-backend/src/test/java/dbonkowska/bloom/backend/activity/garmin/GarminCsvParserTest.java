@@ -76,7 +76,7 @@ class GarminCsvParserTest {
             + "Joga,2026-05-03 20:35:27,false,\"Joga\",\"--\",\"23\",\"00:06:25.8\",\"99\",\"118\"\n"
         );
         GarminParseResult result = parser.parse(csv);
-        assertThat(result.activities().get(0).getDate())
+        assertThat(result.activities().getFirst().getDate())
             .isEqualTo(LocalDateTime.of(2026, 5, 3, 20, 35, 27));
     }
 
@@ -86,7 +86,7 @@ class GarminCsvParserTest {
             + "Joga,2026-01-01 10:00:00,false,\"Joga\",\"--\",\"50\",\"00:06:25.8\",\"--\",\"--\"\n"
         );
         GarminParseResult result = parser.parse(csv);
-        assertThat(result.activities().get(0).getDuration()).isEqualTo(Duration.ofSeconds(385));
+        assertThat(result.activities().getFirst().getDuration()).isEqualTo(Duration.ofSeconds(385));
     }
 
     @Test
@@ -95,7 +95,7 @@ class GarminCsvParserTest {
             + "Trening siłowy,2026-01-01 10:00:00,false,\"Siła\",\"0.00\",\"200\",\"00:34:46\",\"--\",\"--\"\n"
         );
         GarminParseResult result = parser.parse(csv);
-        assertThat(result.activities().get(0).getDuration()).isEqualTo(Duration.ofSeconds(2086));
+        assertThat(result.activities().getFirst().getDuration()).isEqualTo(Duration.ofSeconds(2086));
     }
 
     @Test
@@ -104,7 +104,7 @@ class GarminCsvParserTest {
             + "Chodzenie,2026-01-01 10:00:00,false,\"Spacer\",\"1.11\",\"79\",\"00:14:27\",\"118\",\"125\"\n"
         );
         GarminParseResult result = parser.parse(csv);
-        assertThat(result.activities().get(0).getDistance()).isEqualTo(1110);
+        assertThat(result.activities().getFirst().getDistance()).isEqualTo(1110);
     }
 
     @Test
@@ -113,7 +113,7 @@ class GarminCsvParserTest {
             + "Pływanie na basenie,2026-01-01 10:00:00,false,\"Pływanie\",\"875\",\"342\",\"00:36:04\",\"153\",\"176\"\n"
         );
         GarminParseResult result = parser.parse(csv);
-        assertThat(result.activities().get(0).getDistance()).isEqualTo(875);
+        assertThat(result.activities().getFirst().getDistance()).isEqualTo(875);
     }
 
     @Test
@@ -122,7 +122,7 @@ class GarminCsvParserTest {
             + "Joga,2026-01-01 10:00:00,false,\"Joga\",\"--\",\"23\",\"00:30:00\",\"--\",\"--\"\n"
         );
         GarminParseResult result = parser.parse(csv);
-        assertThat(result.activities().get(0).getDistance()).isNull();
+        assertThat(result.activities().getFirst().getDistance()).isNull();
     }
 
     @Test
@@ -131,7 +131,7 @@ class GarminCsvParserTest {
             + "Joga,2026-01-01 10:00:00,false,\"Joga\",\"--\",\"--\",\"00:30:00\",\"--\",\"--\"\n"
         );
         GarminParseResult result = parser.parse(csv);
-        Activity a = result.activities().get(0);
+        Activity a = result.activities().getFirst();
         assertThat(a.getCalories()).isNull();
         assertThat(a.getAvgHeartRate()).isNull();
         assertThat(a.getMaxHeartRate()).isNull();
