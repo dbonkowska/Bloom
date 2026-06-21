@@ -1,7 +1,6 @@
 package dbonkowska.bloom.backend.activity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -28,7 +27,6 @@ public class Activity {
     @Column(nullable = false)
     private String title;
 
-    @Convert(converter = DurationConverter.class)
     @Column(name = "duration_seconds", nullable = false)
     private Duration duration;
 

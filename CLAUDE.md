@@ -30,3 +30,14 @@ gh issue view <number> --repo dbonkowska/Bloom
 - No Lombok — use Java records for DTOs, IDE generation for entities
 - No comments unless the WHY is non-obvious
 - TDD: write tests first
+
+## PR naming
+
+Use conventional commits format: `<type>: <short description>`
+
+Types: `feat`, `fix`, `chore`, `refactor`, `test`, `docs`
+
+Examples:
+- `feat: Activity domain — entity, repository, GET /api/activities`
+- `fix: correct date-range boundary inclusion in activity query`
+- `chore: scaffold backend, frontend and database`
