@@ -1,18 +1,25 @@
 package dbonkowska.bloom.backend.activity;
 
+import dbonkowska.bloom.backend.activity.garmin.GarminImportResult;
+import dbonkowska.bloom.backend.activity.garmin.GarminImportService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(ActivityController.class)
@@ -23,6 +30,9 @@ class ActivityControllerTest {
 
     @MockitoBean
     private ActivityRepository repository;
+
+    @MockitoBean
+    private GarminImportService importService;
 
     @Test
     void getActivities_noParams_returnsAll() throws Exception {
@@ -64,6 +74,25 @@ class ActivityControllerTest {
         mvc.perform(get("/api/activities").param("from", "2026-01-10T00:00:00"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(1));
+    }
+
+    @Test
+    void importCsv_returnsImportSummary() throws Exception {
+        when(importService.importCsv(any())).thenReturn(
+            new GarminImportResult(18, 2, 1, Set.of("Bieganie"), 0)
+        );
+
+        MockMultipartFile file = new MockMultipartFile(
+            "file", "activities.csv", MediaType.TEXT_PLAIN_VALUE, "csv content".getBytes()
+        );
+
+        mvc.perform(multipart("/api/activities/import").file(file))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.created").value(18))
+            .andExpect(jsonPath("$.skippedDuplicates").value(2))
+            .andExpect(jsonPath("$.skippedUnknownType").value(1))
+            .andExpect(jsonPath("$.unknownTypes[0]").value("Bieganie"))
+            .andExpect(jsonPath("$.skippedMalformed").value(0));
     }
 
     private Activity activity(Long id, LocalDateTime date) {

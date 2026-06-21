@@ -5,7 +5,7 @@ import jakarta.persistence.Converter;
 import java.time.Duration;
 
 @Converter(autoApply = true)
-public class DurationConverter implements AttributeConverter<Duration, Integer> {
+public class ActivityDurationConverter implements AttributeConverter<Duration, Integer> {
 
     @Override
     public Integer convertToDatabaseColumn(Duration duration) {

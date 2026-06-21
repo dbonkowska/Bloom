@@ -1,8 +1,12 @@
 package dbonkowska.bloom.backend.activity;
 
+import dbonkowska.bloom.backend.activity.garmin.GarminImportResult;
+import dbonkowska.bloom.backend.activity.garmin.GarminImportService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -11,9 +15,11 @@ import java.util.List;
 public class ActivityController {
 
     private final ActivityRepository repository;
+    private final GarminImportService importService;
 
-    public ActivityController(ActivityRepository repository) {
+    public ActivityController(ActivityRepository repository, GarminImportService importService) {
         this.repository = repository;
+        this.importService = importService;
     }
 
     @GetMapping
@@ -25,6 +31,11 @@ public class ActivityController {
             ? repository.findByDateBetween(from, to)
             : repository.findAll();
         return activities.stream().map(this::toDto).toList();
+    }
+
+    @PostMapping("/import")
+    public GarminImportResult importCsv(@RequestParam("file") MultipartFile file) throws IOException {
+        return importService.importCsv(file.getInputStream());
     }
 
     private ActivityDto toDto(Activity a) {

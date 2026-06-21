@@ -69,6 +69,25 @@ class ActivityRepositoryTest {
         assertThat(repository.findByDateBetween(boundary, boundary)).hasSize(1);
     }
 
+    @Test
+    void existsByDateAndType_returnsTrueWhenMatch() {
+        LocalDateTime date = LocalDateTime.of(2026, 1, 10, 10, 0);
+        em.persist(activity(date));
+        em.flush();
+
+        assertThat(repository.existsByDateAndType(date, ActivityType.WALKING)).isTrue();
+    }
+
+    @Test
+    void existsByDateAndType_returnsFalseWhenNoMatch() {
+        LocalDateTime date = LocalDateTime.of(2026, 1, 10, 10, 0);
+        em.persist(activity(date));
+        em.flush();
+
+        assertThat(repository.existsByDateAndType(date, ActivityType.YOGA)).isFalse();
+        assertThat(repository.existsByDateAndType(LocalDateTime.of(2026, 2, 1, 10, 0), ActivityType.WALKING)).isFalse();
+    }
+
     private Activity activity(LocalDateTime date) {
         Activity a = new Activity();
         a.setDate(date);

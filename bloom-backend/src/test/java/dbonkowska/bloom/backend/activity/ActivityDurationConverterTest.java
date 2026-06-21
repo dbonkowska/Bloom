@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class DurationConverterTest {
+class ActivityDurationConverterTest {
 
-    private final DurationConverter converter = new DurationConverter();
+    private final ActivityDurationConverter converter = new ActivityDurationConverter();
 
     @Test
     void convertToDatabaseColumn_convertsToSeconds() {
