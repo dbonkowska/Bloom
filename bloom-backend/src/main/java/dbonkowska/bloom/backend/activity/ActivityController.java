@@ -1,10 +1,12 @@
 package dbonkowska.bloom.backend.activity;
 
-import dbonkowska.bloom.backend.activity.garmin.GarminImportResult;
+import dbonkowska.bloom.backend.activity.garmin.GarminImportResultDto;
 import dbonkowska.bloom.backend.activity.garmin.GarminImportService;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -27,6 +29,9 @@ public class ActivityController {
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to
     ) {
+        if (from != null && to != null && from.isAfter(to)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "from must not be after to");
+        }
         List<Activity> activities = (from != null && to != null)
             ? repository.findByDateBetween(from, to)
             : repository.findAll();
@@ -34,7 +39,7 @@ public class ActivityController {
     }
 
     @PostMapping("/import")
-    public GarminImportResult importCsv(@RequestParam("file") MultipartFile file) throws IOException {
+    public GarminImportResultDto importCsv(@RequestParam("file") MultipartFile file) throws IOException {
         return importService.importCsv(file.getInputStream());
     }
 

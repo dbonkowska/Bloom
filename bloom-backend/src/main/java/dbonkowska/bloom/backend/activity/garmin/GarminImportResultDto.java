@@ -2,7 +2,7 @@ package dbonkowska.bloom.backend.activity.garmin;
 
 import java.util.Set;
 
-public record GarminImportResult(
+public record GarminImportResultDto(
     int created,
     int skippedDuplicates,
     int skippedUnknownType,

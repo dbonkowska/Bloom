@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="2026-06-21-create-body-measurement" author="dbbon">
+        <createTable tableName="body_measurement">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="date" type="DATE">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="weight" type="DOUBLE"/>
+            <column name="body_fat_pct" type="DOUBLE"/>
+            <column name="muscle_mass" type="DOUBLE"/>
+            <column name="water_pct" type="DOUBLE"/>
+            <column name="bmi" type="DOUBLE"/>
+            <column name="chest" type="DOUBLE"/>
+            <column name="waist" type="DOUBLE"/>
+            <column name="stomach" type="DOUBLE"/>
+            <column name="hips" type="DOUBLE"/>
+            <column name="forearm_left" type="DOUBLE"/>
+            <column name="forearm_right" type="DOUBLE"/>
+            <column name="arm_left" type="DOUBLE"/>
+            <column name="arm_right" type="DOUBLE"/>
+            <column name="thigh_left" type="DOUBLE"/>
+            <column name="thigh_right" type="DOUBLE"/>
+            <column name="calf_left" type="DOUBLE"/>
+            <column name="calf_right" type="DOUBLE"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2026-06-22-add-body-measurement-bones-pct" author="dbbon">
+        <addColumn tableName="body_measurement">
+            <column name="bones_pct" type="DOUBLE"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

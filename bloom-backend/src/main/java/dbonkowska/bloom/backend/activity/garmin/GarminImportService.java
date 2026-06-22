@@ -18,7 +18,7 @@ public class GarminImportService {
         this.parser = parser;
     }
 
-    public GarminImportResult importCsv(InputStream input) throws IOException {
+    public GarminImportResultDto importCsv(InputStream input) throws IOException {
         var parseResult = parser.parse(input);
         int created = 0;
         int skippedDuplicates = 0;
@@ -32,7 +32,7 @@ public class GarminImportService {
             created++;
         }
 
-        return new GarminImportResult(
+        return new GarminImportResultDto(
             created,
             skippedDuplicates,
             parseResult.unknownTypeCount(),
