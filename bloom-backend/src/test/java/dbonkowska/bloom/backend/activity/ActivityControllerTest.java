@@ -1,6 +1,6 @@
 package dbonkowska.bloom.backend.activity;
 
-import dbonkowska.bloom.backend.activity.garmin.GarminImportResult;
+import dbonkowska.bloom.backend.activity.garmin.GarminImportResultDto;
 import dbonkowska.bloom.backend.activity.garmin.GarminImportService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +66,14 @@ class ActivityControllerTest {
     }
 
     @Test
+    void getActivities_fromAfterTo_returns400() throws Exception {
+        mvc.perform(get("/api/activities")
+                .param("from", "2026-01-20T00:00:00")
+                .param("to", "2026-01-10T00:00:00"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void getActivities_withOnlyOneParam_returnsAll() throws Exception {
         when(repository.findAll()).thenReturn(List.of(
             activity(1L, LocalDateTime.of(2026, 1, 10, 10, 0))
@@ -79,7 +87,7 @@ class ActivityControllerTest {
     @Test
     void importCsv_returnsImportSummary() throws Exception {
         when(importService.importCsv(any())).thenReturn(
-            new GarminImportResult(18, 2, 1, Set.of("Bieganie"), 0)
+            new GarminImportResultDto(18, 2, 1, Set.of("Bieganie"), 0)
         );
 
         MockMultipartFile file = new MockMultipartFile(

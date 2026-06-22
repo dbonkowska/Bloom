@@ -42,7 +42,7 @@ class GarminImportServiceTest {
         );
         when(repository.existsByDateAndType(any(), any())).thenReturn(false);
 
-        GarminImportResult result = service.importCsv(emptyStream());
+        GarminImportResultDto result = service.importCsv(emptyStream());
 
         assertThat(result.created()).isEqualTo(1);
         assertThat(result.skippedDuplicates()).isZero();
@@ -56,7 +56,7 @@ class GarminImportServiceTest {
         );
         when(repository.existsByDateAndType(any(), any())).thenReturn(true);
 
-        GarminImportResult result = service.importCsv(emptyStream());
+        GarminImportResultDto result = service.importCsv(emptyStream());
 
         assertThat(result.skippedDuplicates()).isEqualTo(1);
         assertThat(result.created()).isZero();
@@ -69,7 +69,7 @@ class GarminImportServiceTest {
             new GarminParseResult(List.of(), Set.of("Bieganie"), 1, 0)
         );
 
-        GarminImportResult result = service.importCsv(emptyStream());
+        GarminImportResultDto result = service.importCsv(emptyStream());
 
         assertThat(result.skippedUnknownType()).isEqualTo(1);
         assertThat(result.unknownTypes()).containsExactly("Bieganie");
@@ -81,7 +81,7 @@ class GarminImportServiceTest {
             new GarminParseResult(List.of(), Set.of("Bieganie"), 10, 0)
         );
 
-        GarminImportResult result = service.importCsv(emptyStream());
+        GarminImportResultDto result = service.importCsv(emptyStream());
 
         assertThat(result.skippedUnknownType()).isEqualTo(10);
     }
@@ -92,7 +92,7 @@ class GarminImportServiceTest {
             new GarminParseResult(List.of(), Set.of(), 0, 3)
         );
 
-        GarminImportResult result = service.importCsv(emptyStream());
+        GarminImportResultDto result = service.importCsv(emptyStream());
 
         assertThat(result.skippedMalformed()).isEqualTo(3);
     }

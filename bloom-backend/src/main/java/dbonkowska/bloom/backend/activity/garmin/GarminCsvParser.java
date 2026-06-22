@@ -4,6 +4,8 @@ import dbonkowska.bloom.backend.activity.Activity;
 import dbonkowska.bloom.backend.activity.ActivityType;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -20,6 +22,8 @@ import java.util.Set;
 
 @Component
 public class GarminCsvParser {
+
+    private static final Logger log = LoggerFactory.getLogger(GarminCsvParser.class);
 
     private static final DateTimeFormatter DATE_FORMAT =
         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -63,7 +67,10 @@ public class GarminCsvParser {
                     a.setMaxHeartRate(parseNullableInt(record.get("Maksymalne tętno")));
                     a.setCalories(parseNullableInt(record.get("Suma kalorii")));
                     activities.add(a);
+                } catch (NumberFormatException | java.time.format.DateTimeParseException | ArrayIndexOutOfBoundsException e) {
+                    malformedCount++;
                 } catch (Exception e) {
+                    log.warn("Unexpected error parsing CSV row: {}", e.getMessage(), e);
                     malformedCount++;
                 }
             }
@@ -75,9 +82,9 @@ public class GarminCsvParser {
     private Duration parseDuration(String value) {
         String stripped = value.replaceAll("\\.\\d+$", "");
         String[] parts = stripped.split(":");
-        long seconds = Long.parseLong(parts[0]) * 3600
-            + Long.parseLong(parts[1]) * 60
-            + Long.parseLong(parts[2]);
+        long seconds = parts.length == 3
+            ? Long.parseLong(parts[0]) * 3600 + Long.parseLong(parts[1]) * 60 + Long.parseLong(parts[2])
+            : Long.parseLong(parts[0]) * 60 + Long.parseLong(parts[1]);
         return Duration.ofSeconds(seconds);
     }
 
