@@ -10,5 +10,10 @@
     <include file="db/changelog/changes/2026-07-02-create-author.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/changes/2026-07-02-create-workout.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/changes/2026-07-05-rename-activity-to-session.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/2026-07-05-create-program.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/2026-07-05-create-program-day.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/2026-07-05-create-program-workout.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/2026-07-05-create-program-cycle.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/2026-07-05-create-planned-session.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

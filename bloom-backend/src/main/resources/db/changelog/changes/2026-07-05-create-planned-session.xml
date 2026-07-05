@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="2026-07-05-create-planned-session" author="dbbon">
+        <createTable tableName="planned_session">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workout_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_planned_session_workout" references="workout(id)"/>
+            </column>
+            <column name="program_cycle_id" type="BIGINT">
+                <constraints foreignKeyName="fk_planned_session_cycle" references="program_cycle(id)"/>
+            </column>
+            <column name="program_workout_id" type="BIGINT">
+                <constraints foreignKeyName="fk_planned_session_program_workout" references="program_workout(id)"/>
+            </column>
+            <column name="completed" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
