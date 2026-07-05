@@ -1,12 +1,12 @@
-package dbonkowska.bloom.backend.activity;
+package dbonkowska.bloom.backend.session;
 
 import org.junit.jupiter.api.Test;
 import java.time.Duration;
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ActivityDurationConverterTest {
+class SessionDurationConverterTest {
 
-    private final ActivityDurationConverter converter = new ActivityDurationConverter();
+    private final SessionDurationConverter converter = new SessionDurationConverter();
 
     @Test
     void convertToDatabaseColumn_convertsToSeconds() {

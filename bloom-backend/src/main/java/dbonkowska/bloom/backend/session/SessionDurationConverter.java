@@ -1,11 +1,11 @@
-package dbonkowska.bloom.backend.activity;
+package dbonkowska.bloom.backend.session;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import java.time.Duration;
 
 @Converter(autoApply = true)
-public class ActivityDurationConverter implements AttributeConverter<Duration, Integer> {
+public class SessionDurationConverter implements AttributeConverter<Duration, Integer> {
 
     @Override
     public Integer convertToDatabaseColumn(Duration duration) {

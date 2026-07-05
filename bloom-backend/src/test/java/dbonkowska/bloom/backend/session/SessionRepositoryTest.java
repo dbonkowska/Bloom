@@ -1,4 +1,4 @@
-package dbonkowska.bloom.backend.activity;
+package dbonkowska.bloom.backend.session;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ImportTestcontainers
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @AutoConfigureDataSourceInitialization
-class ActivityRepositoryTest {
+class SessionRepositoryTest {
 
     @ServiceConnection
     static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:17");
@@ -29,31 +29,31 @@ class ActivityRepositoryTest {
     private TestEntityManager em;
 
     @Autowired
-    private ActivityRepository repository;
+    private SessionRepository repository;
 
     @Test
-    void findAll_returnsAllActivities() {
-        em.persist(activity(LocalDateTime.of(2026, 1, 10, 10, 0)));
-        em.persist(activity(LocalDateTime.of(2026, 1, 20, 10, 0)));
+    void findAll_returnsAllSessions() {
+        em.persist(session(LocalDateTime.of(2026, 1, 10, 10, 0)));
+        em.persist(session(LocalDateTime.of(2026, 1, 20, 10, 0)));
         em.flush();
 
         assertThat(repository.findAll()).hasSize(2);
     }
 
     @Test
-    void findByDateBetween_returnsOnlyActivitiesInRange() {
-        em.persist(activity(LocalDateTime.of(2026, 1, 5, 10, 0)));
-        em.persist(activity(LocalDateTime.of(2026, 1, 10, 10, 0)));
-        em.persist(activity(LocalDateTime.of(2026, 1, 20, 10, 0)));
+    void findByDateBetween_returnsOnlySessionsInRange() {
+        em.persist(session(LocalDateTime.of(2026, 1, 5, 10, 0)));
+        em.persist(session(LocalDateTime.of(2026, 1, 10, 10, 0)));
+        em.persist(session(LocalDateTime.of(2026, 1, 20, 10, 0)));
         em.flush();
 
-        List<Activity> result = repository.findByDateBetween(
+        List<Session> result = repository.findByDateBetween(
             LocalDateTime.of(2026, 1, 9, 0, 0),
             LocalDateTime.of(2026, 1, 21, 0, 0)
         );
 
         assertThat(result).hasSize(2);
-        assertThat(result).extracting(Activity::getDate)
+        assertThat(result).extracting(Session::getDate)
             .containsExactlyInAnyOrder(
                 LocalDateTime.of(2026, 1, 10, 10, 0),
                 LocalDateTime.of(2026, 1, 20, 10, 0)
@@ -63,7 +63,7 @@ class ActivityRepositoryTest {
     @Test
     void findByDateBetween_boundaryDatesAreInclusive() {
         LocalDateTime boundary = LocalDateTime.of(2026, 1, 10, 10, 0);
-        em.persist(activity(boundary));
+        em.persist(session(boundary));
         em.flush();
 
         assertThat(repository.findByDateBetween(boundary, boundary)).hasSize(1);
@@ -72,28 +72,28 @@ class ActivityRepositoryTest {
     @Test
     void existsByDateAndType_returnsTrueWhenMatch() {
         LocalDateTime date = LocalDateTime.of(2026, 1, 10, 10, 0);
-        em.persist(activity(date));
+        em.persist(session(date));
         em.flush();
 
-        assertThat(repository.existsByDateAndType(date, ActivityType.WALKING)).isTrue();
+        assertThat(repository.existsByDateAndType(date, SessionType.WALKING)).isTrue();
     }
 
     @Test
     void existsByDateAndType_returnsFalseWhenNoMatch() {
         LocalDateTime date = LocalDateTime.of(2026, 1, 10, 10, 0);
-        em.persist(activity(date));
+        em.persist(session(date));
         em.flush();
 
-        assertThat(repository.existsByDateAndType(date, ActivityType.YOGA)).isFalse();
-        assertThat(repository.existsByDateAndType(LocalDateTime.of(2026, 2, 1, 10, 0), ActivityType.WALKING)).isFalse();
+        assertThat(repository.existsByDateAndType(date, SessionType.YOGA)).isFalse();
+        assertThat(repository.existsByDateAndType(LocalDateTime.of(2026, 2, 1, 10, 0), SessionType.WALKING)).isFalse();
     }
 
-    private Activity activity(LocalDateTime date) {
-        Activity a = new Activity();
-        a.setDate(date);
-        a.setType(ActivityType.WALKING);
-        a.setTitle("Test walk");
-        a.setDuration(Duration.ofMinutes(30));
-        return a;
+    private Session session(LocalDateTime date) {
+        Session s = new Session();
+        s.setDate(date);
+        s.setType(SessionType.WALKING);
+        s.setTitle("Test walk");
+        s.setDuration(Duration.ofMinutes(30));
+        return s;
     }
 }

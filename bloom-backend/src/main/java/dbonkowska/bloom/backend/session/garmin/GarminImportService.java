@@ -1,7 +1,7 @@
-package dbonkowska.bloom.backend.activity.garmin;
+package dbonkowska.bloom.backend.session.garmin;
 
-import dbonkowska.bloom.backend.activity.Activity;
-import dbonkowska.bloom.backend.activity.ActivityRepository;
+import dbonkowska.bloom.backend.session.Session;
+import dbonkowska.bloom.backend.session.SessionRepository;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -10,10 +10,10 @@ import java.io.InputStream;
 @Service
 public class GarminImportService {
 
-    private final ActivityRepository repository;
+    private final SessionRepository repository;
     private final GarminCsvParser parser;
 
-    public GarminImportService(ActivityRepository repository, GarminCsvParser parser) {
+    public GarminImportService(SessionRepository repository, GarminCsvParser parser) {
         this.repository = repository;
         this.parser = parser;
     }
@@ -23,12 +23,12 @@ public class GarminImportService {
         int created = 0;
         int skippedDuplicates = 0;
 
-        for (Activity activity : parseResult.activities()) {
-            if (repository.existsByDateAndType(activity.getDate(), activity.getType())) {
+        for (Session session : parseResult.activities()) {
+            if (repository.existsByDateAndType(session.getDate(), session.getType())) {
                 skippedDuplicates++;
                 continue;
             }
-            repository.save(activity);
+            repository.save(session);
             created++;
         }
 

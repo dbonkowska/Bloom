@@ -9,5 +9,6 @@
     <include file="db/changelog/changes/2026-06-21-create-body-measurement.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/changes/2026-07-02-create-author.xml" relativeToChangelogFile="false"/>
     <include file="db/changelog/changes/2026-07-02-create-workout.xml" relativeToChangelogFile="false"/>
+    <include file="db/changelog/changes/2026-07-05-rename-activity-to-session.xml" relativeToChangelogFile="false"/>
 
 </databaseChangeLog>

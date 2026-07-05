@@ -1,7 +1,7 @@
-package dbonkowska.bloom.backend.activity.garmin;
+package dbonkowska.bloom.backend.session.garmin;
 
-import dbonkowska.bloom.backend.activity.Activity;
-import dbonkowska.bloom.backend.activity.ActivityType;
+import dbonkowska.bloom.backend.session.Session;
+import dbonkowska.bloom.backend.session.SessionType;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
@@ -28,15 +28,15 @@ public class GarminCsvParser {
     private static final DateTimeFormatter DATE_FORMAT =
         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    private static final Map<String, ActivityType> TYPE_MAP = Map.of(
-        "Chodzenie", ActivityType.WALKING,
-        "Joga", ActivityType.YOGA,
-        "Trening siłowy", ActivityType.STRENGTH_TRAINING,
-        "Pływanie na basenie", ActivityType.POOL_SWIMMING
+    private static final Map<String, SessionType> TYPE_MAP = Map.of(
+        "Chodzenie", SessionType.WALKING,
+        "Joga", SessionType.YOGA,
+        "Trening siłowy", SessionType.STRENGTH_TRAINING,
+        "Pływanie na basenie", SessionType.POOL_SWIMMING
     );
 
     public GarminParseResult parse(InputStream input) throws IOException {
-        var activities = new ArrayList<Activity>();
+        var sessions = new ArrayList<Session>();
         var unknownTypes = new HashSet<String>();
         int unknownTypeCount = 0;
         int malformedCount = 0;
@@ -51,22 +51,22 @@ public class GarminCsvParser {
             for (CSVRecord record : format.parse(reader)) {
                 try {
                     String rawType = record.get("Typ aktywności");
-                    ActivityType type = TYPE_MAP.get(rawType);
+                    SessionType type = TYPE_MAP.get(rawType);
                     if (type == null) {
                         unknownTypes.add(rawType);
                         unknownTypeCount++;
                         continue;
                     }
-                    Activity a = new Activity();
-                    a.setDate(LocalDateTime.parse(record.get("Data"), DATE_FORMAT));
-                    a.setType(type);
-                    a.setTitle(record.get("Tytuł"));
-                    a.setDuration(parseDuration(record.get("Czas")));
-                    a.setDistance(parseDistance(record.get("Dystans")));
-                    a.setAvgHeartRate(parseNullableInt(record.get("Średnie tętno")));
-                    a.setMaxHeartRate(parseNullableInt(record.get("Maksymalne tętno")));
-                    a.setCalories(parseNullableInt(record.get("Suma kalorii")));
-                    activities.add(a);
+                    Session s = new Session();
+                    s.setDate(LocalDateTime.parse(record.get("Data"), DATE_FORMAT));
+                    s.setType(type);
+                    s.setTitle(record.get("Tytuł"));
+                    s.setDuration(parseDuration(record.get("Czas")));
+                    s.setDistance(parseDistance(record.get("Dystans")));
+                    s.setAvgHeartRate(parseNullableInt(record.get("Średnie tętno")));
+                    s.setMaxHeartRate(parseNullableInt(record.get("Maksymalne tętno")));
+                    s.setCalories(parseNullableInt(record.get("Suma kalorii")));
+                    sessions.add(s);
                 } catch (NumberFormatException | java.time.format.DateTimeParseException | ArrayIndexOutOfBoundsException e) {
                     malformedCount++;
                 } catch (Exception e) {
@@ -76,7 +76,7 @@ public class GarminCsvParser {
             }
         }
 
-        return new GarminParseResult(activities, Set.copyOf(unknownTypes), unknownTypeCount, malformedCount);
+        return new GarminParseResult(sessions, Set.copyOf(unknownTypes), unknownTypeCount, malformedCount);
     }
 
     private Duration parseDuration(String value) {

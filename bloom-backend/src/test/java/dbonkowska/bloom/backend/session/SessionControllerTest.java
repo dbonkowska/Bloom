@@ -1,7 +1,7 @@
-package dbonkowska.bloom.backend.activity;
+package dbonkowska.bloom.backend.session;
 
-import dbonkowska.bloom.backend.activity.garmin.GarminImportResultDto;
-import dbonkowska.bloom.backend.activity.garmin.GarminImportService;
+import dbonkowska.bloom.backend.session.garmin.GarminImportResultDto;
+import dbonkowska.bloom.backend.session.garmin.GarminImportService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -22,25 +22,25 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(ActivityController.class)
-class ActivityControllerTest {
+@WebMvcTest(SessionController.class)
+class SessionControllerTest {
 
     @Autowired
     private MockMvc mvc;
 
     @MockitoBean
-    private ActivityRepository repository;
+    private SessionRepository repository;
 
     @MockitoBean
     private GarminImportService importService;
 
     @Test
-    void getActivities_noParams_returnsAll() throws Exception {
+    void getSessions_noParams_returnsAll() throws Exception {
         when(repository.findAll()).thenReturn(List.of(
-            activity(1L, LocalDateTime.of(2026, 1, 10, 10, 0))
+            session(1L, LocalDateTime.of(2026, 1, 10, 10, 0))
         ));
 
-        mvc.perform(get("/api/activities"))
+        mvc.perform(get("/api/sessions"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(1))
             .andExpect(jsonPath("$[0].id").value(1))
@@ -49,15 +49,15 @@ class ActivityControllerTest {
     }
 
     @Test
-    void getActivities_withDateRange_returnsFiltered() throws Exception {
+    void getSessions_withDateRange_returnsFiltered() throws Exception {
         when(repository.findByDateBetween(
             eq(LocalDateTime.of(2026, 1, 10, 0, 0)),
             eq(LocalDateTime.of(2026, 1, 20, 0, 0))
         )).thenReturn(List.of(
-            activity(2L, LocalDateTime.of(2026, 1, 15, 10, 0))
+            session(2L, LocalDateTime.of(2026, 1, 15, 10, 0))
         ));
 
-        mvc.perform(get("/api/activities")
+        mvc.perform(get("/api/sessions")
                 .param("from", "2026-01-10T00:00:00")
                 .param("to", "2026-01-20T00:00:00"))
             .andExpect(status().isOk())
@@ -66,20 +66,20 @@ class ActivityControllerTest {
     }
 
     @Test
-    void getActivities_fromAfterTo_returns400() throws Exception {
-        mvc.perform(get("/api/activities")
+    void getSessions_fromAfterTo_returns400() throws Exception {
+        mvc.perform(get("/api/sessions")
                 .param("from", "2026-01-20T00:00:00")
                 .param("to", "2026-01-10T00:00:00"))
             .andExpect(status().isBadRequest());
     }
 
     @Test
-    void getActivities_withOnlyOneParam_returnsAll() throws Exception {
+    void getSessions_withOnlyOneParam_returnsAll() throws Exception {
         when(repository.findAll()).thenReturn(List.of(
-            activity(1L, LocalDateTime.of(2026, 1, 10, 10, 0))
+            session(1L, LocalDateTime.of(2026, 1, 10, 10, 0))
         ));
 
-        mvc.perform(get("/api/activities").param("from", "2026-01-10T00:00:00"))
+        mvc.perform(get("/api/sessions").param("from", "2026-01-10T00:00:00"))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.length()").value(1));
     }
@@ -94,7 +94,7 @@ class ActivityControllerTest {
             "file", "activities.csv", MediaType.TEXT_PLAIN_VALUE, "csv content".getBytes()
         );
 
-        mvc.perform(multipart("/api/activities/import").file(file))
+        mvc.perform(multipart("/api/sessions/import").file(file))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.created").value(18))
             .andExpect(jsonPath("$.skippedDuplicates").value(2))
@@ -103,13 +103,13 @@ class ActivityControllerTest {
             .andExpect(jsonPath("$.skippedMalformed").value(0));
     }
 
-    private Activity activity(Long id, LocalDateTime date) {
-        Activity a = new Activity();
-        a.setId(id);
-        a.setDate(date);
-        a.setType(ActivityType.WALKING);
-        a.setTitle("Test walk");
-        a.setDuration(Duration.ofMinutes(30));
-        return a;
+    private Session session(Long id, LocalDateTime date) {
+        Session s = new Session();
+        s.setId(id);
+        s.setDate(date);
+        s.setType(SessionType.WALKING);
+        s.setTitle("Test walk");
+        s.setDuration(Duration.ofMinutes(30));
+        return s;
     }
 }

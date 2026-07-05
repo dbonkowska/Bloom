@@ -1,7 +1,7 @@
-package dbonkowska.bloom.backend.activity.garmin;
+package dbonkowska.bloom.backend.session.garmin;
 
-import dbonkowska.bloom.backend.activity.Activity;
-import dbonkowska.bloom.backend.activity.ActivityType;
+import dbonkowska.bloom.backend.session.Session;
+import dbonkowska.bloom.backend.session.SessionType;
 import org.junit.jupiter.api.Test;
 
 import java.io.ByteArrayInputStream;
@@ -37,12 +37,12 @@ class GarminCsvParserTest {
             + "Chodzenie,2026-01-04 10:00:00,false,\"Spacer\",\"2.50\",\"100\",\"00:30:00\",\"100\",\"120\"\n"
         );
         GarminParseResult result = parser.parse(csv);
-        assertThat(result.activities()).extracting(Activity::getType)
+        assertThat(result.activities()).extracting(Session::getType)
             .containsExactly(
-                ActivityType.YOGA,
-                ActivityType.STRENGTH_TRAINING,
-                ActivityType.POOL_SWIMMING,
-                ActivityType.WALKING
+                SessionType.YOGA,
+                SessionType.STRENGTH_TRAINING,
+                SessionType.POOL_SWIMMING,
+                SessionType.WALKING
             );
     }
 
@@ -131,10 +131,10 @@ class GarminCsvParserTest {
             + "Joga,2026-01-01 10:00:00,false,\"Joga\",\"--\",\"--\",\"00:30:00\",\"--\",\"--\"\n"
         );
         GarminParseResult result = parser.parse(csv);
-        Activity a = result.activities().getFirst();
-        assertThat(a.getCalories()).isNull();
-        assertThat(a.getAvgHeartRate()).isNull();
-        assertThat(a.getMaxHeartRate()).isNull();
+        Session s = result.activities().getFirst();
+        assertThat(s.getCalories()).isNull();
+        assertThat(s.getAvgHeartRate()).isNull();
+        assertThat(s.getMaxHeartRate()).isNull();
     }
 
     @Test

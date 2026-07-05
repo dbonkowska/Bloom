@@ -1,8 +1,8 @@
-package dbonkowska.bloom.backend.activity.garmin;
+package dbonkowska.bloom.backend.session.garmin;
 
-import dbonkowska.bloom.backend.activity.Activity;
-import dbonkowska.bloom.backend.activity.ActivityRepository;
-import dbonkowska.bloom.backend.activity.ActivityType;
+import dbonkowska.bloom.backend.session.Session;
+import dbonkowska.bloom.backend.session.SessionRepository;
+import dbonkowska.bloom.backend.session.SessionType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 class GarminImportServiceTest {
 
     @Mock
-    private ActivityRepository repository;
+    private SessionRepository repository;
 
     @Mock
     private GarminCsvParser parser;
@@ -36,9 +36,9 @@ class GarminImportServiceTest {
     private InputStream emptyStream() { return new ByteArrayInputStream(new byte[0]); }
 
     @Test
-    void importCsv_savesNewActivities() throws Exception {
+    void importCsv_savesNewSessions() throws Exception {
         when(parser.parse(any())).thenReturn(
-            new GarminParseResult(List.of(activity()), Set.of(), 0, 0)
+            new GarminParseResult(List.of(session()), Set.of(), 0, 0)
         );
         when(repository.existsByDateAndType(any(), any())).thenReturn(false);
 
@@ -46,13 +46,13 @@ class GarminImportServiceTest {
 
         assertThat(result.created()).isEqualTo(1);
         assertThat(result.skippedDuplicates()).isZero();
-        verify(repository).save(any(Activity.class));
+        verify(repository).save(any(Session.class));
     }
 
     @Test
     void importCsv_skipsDuplicates() throws Exception {
         when(parser.parse(any())).thenReturn(
-            new GarminParseResult(List.of(activity()), Set.of(), 0, 0)
+            new GarminParseResult(List.of(session()), Set.of(), 0, 0)
         );
         when(repository.existsByDateAndType(any(), any())).thenReturn(true);
 
@@ -98,8 +98,8 @@ class GarminImportServiceTest {
     }
 
     @Test
-    void importCsv_savesActivityFromParserDirectly() throws Exception {
-        Activity parsed = activity();
+    void importCsv_savesSessionFromParserDirectly() throws Exception {
+        Session parsed = session();
         when(parser.parse(any())).thenReturn(
             new GarminParseResult(List.of(parsed), Set.of(), 0, 0)
         );
@@ -111,12 +111,12 @@ class GarminImportServiceTest {
         verify(repository).save(same(parsed));
     }
 
-    private Activity activity() {
-        Activity a = new Activity();
-        a.setDate(LocalDateTime.of(2026, 1, 10, 10, 0));
-        a.setType(ActivityType.WALKING);
-        a.setTitle("Walk");
-        a.setDuration(Duration.ofMinutes(30));
-        return a;
+    private Session session() {
+        Session s = new Session();
+        s.setDate(LocalDateTime.of(2026, 1, 10, 10, 0));
+        s.setType(SessionType.WALKING);
+        s.setTitle("Walk");
+        s.setDuration(Duration.ofMinutes(30));
+        return s;
     }
 }

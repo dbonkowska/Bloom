@@ -1,4 +1,4 @@
-package dbonkowska.bloom.backend.activity.garmin;
+package dbonkowska.bloom.backend.session.garmin;
 
 import java.util.Set;
 

@@ -1,4 +1,4 @@
-package dbonkowska.bloom.backend.activity;
+package dbonkowska.bloom.backend.session;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,7 +11,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Entity
-public class Activity {
+public class Session {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +22,7 @@ public class Activity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
-    private ActivityType type;
+    private SessionType type;
 
     @Column(nullable = false)
     private String title;
@@ -45,8 +45,8 @@ public class Activity {
     public void setId(Long id) { this.id = id; }
     public LocalDateTime getDate() { return date; }
     public void setDate(LocalDateTime date) { this.date = date; }
-    public ActivityType getType() { return type; }
-    public void setType(ActivityType type) { this.type = type; }
+    public SessionType getType() { return type; }
+    public void setType(SessionType type) { this.type = type; }
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
     public Duration getDuration() { return duration; }

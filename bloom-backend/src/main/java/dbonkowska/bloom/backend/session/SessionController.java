@@ -1,7 +1,7 @@
-package dbonkowska.bloom.backend.activity;
+package dbonkowska.bloom.backend.session;
 
-import dbonkowska.bloom.backend.activity.garmin.GarminImportResultDto;
-import dbonkowska.bloom.backend.activity.garmin.GarminImportService;
+import dbonkowska.bloom.backend.session.garmin.GarminImportResultDto;
+import dbonkowska.bloom.backend.session.garmin.GarminImportService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -13,29 +13,29 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/activities")
-public class ActivityController {
+@RequestMapping("/api/sessions")
+public class SessionController {
 
-    private final ActivityRepository repository;
+    private final SessionRepository repository;
     private final GarminImportService importService;
 
-    public ActivityController(ActivityRepository repository, GarminImportService importService) {
+    public SessionController(SessionRepository repository, GarminImportService importService) {
         this.repository = repository;
         this.importService = importService;
     }
 
     @GetMapping
-    public List<ActivityDto> list(
+    public List<SessionDto> list(
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
         @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to
     ) {
         if (from != null && to != null && from.isAfter(to)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "from must not be after to");
         }
-        List<Activity> activities = (from != null && to != null)
+        List<Session> sessions = (from != null && to != null)
             ? repository.findByDateBetween(from, to)
             : repository.findAll();
-        return activities.stream().map(this::toDto).toList();
+        return sessions.stream().map(this::toDto).toList();
     }
 
     @PostMapping("/import")
@@ -43,17 +43,17 @@ public class ActivityController {
         return importService.importCsv(file.getInputStream());
     }
 
-    private ActivityDto toDto(Activity a) {
-        return new ActivityDto(
-            a.getId(),
-            a.getDate(),
-            a.getType(),
-            a.getTitle(),
-            Math.toIntExact(a.getDuration().getSeconds()),
-            a.getDistance(),
-            a.getAvgHeartRate(),
-            a.getMaxHeartRate(),
-            a.getCalories()
+    private SessionDto toDto(Session s) {
+        return new SessionDto(
+            s.getId(),
+            s.getDate(),
+            s.getType(),
+            s.getTitle(),
+            Math.toIntExact(s.getDuration().getSeconds()),
+            s.getDistance(),
+            s.getAvgHeartRate(),
+            s.getMaxHeartRate(),
+            s.getCalories()
         );
     }
 }

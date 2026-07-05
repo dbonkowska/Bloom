@@ -1,11 +1,11 @@
-package dbonkowska.bloom.backend.activity.garmin;
+package dbonkowska.bloom.backend.session.garmin;
 
-import dbonkowska.bloom.backend.activity.Activity;
+import dbonkowska.bloom.backend.session.Session;
 import java.util.List;
 import java.util.Set;
 
 public record GarminParseResult(
-    List<Activity> activities,
+    List<Session> activities,
     Set<String> unknownTypes,
     int unknownTypeCount,
     int malformedCount

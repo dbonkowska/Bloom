@@ -1,11 +1,11 @@
-package dbonkowska.bloom.backend.activity;
+package dbonkowska.bloom.backend.session;
 
 import java.time.LocalDateTime;
 
-public record ActivityDto(
+public record SessionDto(
     Long id,
     LocalDateTime date,
-    ActivityType type,
+    SessionType type,
     String title,
     Integer durationSeconds,
     Integer distance,
