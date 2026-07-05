@@ -30,6 +30,8 @@ gh issue view <number> --repo dbonkowska/Bloom
 - No Lombok — use Java records for DTOs, IDE generation for entities
 - No comments unless the WHY is non-obvious
 - TDD: write tests first
+- Every domain has a service layer — controllers are HTTP-only adapters, services own business logic and DTO mapping
+- Integration tests use `@SpringBootTest` + Testcontainers + MockMvc (one per domain); `@DataJpaTest` only for Specification predicate tests
 
 ## PR naming
 
