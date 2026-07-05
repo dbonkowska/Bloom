@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="2026-07-02-create-workout" author="dbbon">
+        <createTable tableName="workout">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="youtube_url" type="VARCHAR(255)"/>
+            <column name="duration_minutes" type="INT"/>
+            <column name="notes" type="VARCHAR(255)"/>
+            <column name="author_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_workout_author" references="author(id)"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2026-07-02-create-workout-muscle-group" author="dbbon">
+        <createTable tableName="workout_muscle_group">
+            <column name="workout_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_workout_muscle_group_workout" references="workout(id)"/>
+            </column>
+            <column name="muscle_group" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
