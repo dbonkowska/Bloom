@@ -419,6 +419,78 @@ class ProgramIntegrationTest {
             .andExpect(status().isNotFound());
     }
 
+    // --- PATCH /api/planned-sessions/{id}/reschedule ---
+
+    @Test
+    void reschedulePlannedSession_updatesDate() throws Exception {
+        PlannedSession saved = plannedSessionRepository.save(session(LocalDate.of(2026, 3, 10)));
+
+        mvc.perform(patch("/api/planned-sessions/" + saved.getId() + "/reschedule")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"date":"2026-03-15"}
+                    """))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.date").value("2026-03-15"))
+            .andExpect(jsonPath("$.workout.name").value(defaultWorkout.getName()))
+            .andExpect(jsonPath("$.programCycleId").value(org.hamcrest.Matchers.nullValue()))
+            .andExpect(jsonPath("$.programWorkoutId").value(org.hamcrest.Matchers.nullValue()));
+    }
+
+    @Test
+    void reschedulePlannedSession_unknownId_returns404() throws Exception {
+        mvc.perform(patch("/api/planned-sessions/999/reschedule")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"date":"2026-03-15"}
+                    """))
+            .andExpect(status().isNotFound());
+    }
+
+    // --- PATCH /api/planned-sessions/{id}/complete ---
+
+    @Test
+    void completePlannedSession_setsCompletedTrue() throws Exception {
+        PlannedSession saved = plannedSessionRepository.save(session(LocalDate.of(2026, 3, 10)));
+
+        mvc.perform(patch("/api/planned-sessions/" + saved.getId() + "/complete"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.completed").value(true));
+    }
+
+    @Test
+    void completePlannedSession_alreadyComplete_isIdempotent() throws Exception {
+        PlannedSession s = session(LocalDate.of(2026, 3, 10));
+        s.setCompleted(true);
+        PlannedSession saved = plannedSessionRepository.save(s);
+
+        mvc.perform(patch("/api/planned-sessions/" + saved.getId() + "/complete"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.completed").value(true));
+    }
+
+    // --- PATCH /api/planned-sessions/{id}/incomplete ---
+
+    @Test
+    void incompletePlannedSession_setsCompletedFalse() throws Exception {
+        PlannedSession s = session(LocalDate.of(2026, 3, 10));
+        s.setCompleted(true);
+        PlannedSession saved = plannedSessionRepository.save(s);
+
+        mvc.perform(patch("/api/planned-sessions/" + saved.getId() + "/incomplete"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.completed").value(false));
+    }
+
+    @Test
+    void incompletePlannedSession_alreadyIncomplete_isIdempotent() throws Exception {
+        PlannedSession saved = plannedSessionRepository.save(session(LocalDate.of(2026, 3, 10)));
+
+        mvc.perform(patch("/api/planned-sessions/" + saved.getId() + "/incomplete"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.completed").value(false));
+    }
+
     private PlannedSession session(LocalDate date) {
         PlannedSession s = new PlannedSession();
         s.setDate(date);

@@ -42,4 +42,19 @@ public class PlannedSessionController {
     public void delete(@PathVariable Long id) {
         plannedSessionService.delete(id);
     }
+
+    @PatchMapping("/{id}/reschedule")
+    public PlannedSessionDto reschedule(@PathVariable Long id, @Valid @RequestBody PlannedSessionRescheduleRequest request) {
+        return plannedSessionService.reschedule(id, request);
+    }
+
+    @PatchMapping("/{id}/complete")
+    public PlannedSessionDto complete(@PathVariable Long id) {
+        return plannedSessionService.complete(id);
+    }
+
+    @PatchMapping("/{id}/incomplete")
+    public PlannedSessionDto incomplete(@PathVariable Long id) {
+        return plannedSessionService.incomplete(id);
+    }
 }

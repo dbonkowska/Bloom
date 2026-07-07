@@ -73,6 +73,27 @@ public class PlannedSessionService {
         plannedSessionRepository.deleteById(id);
     }
 
+    public PlannedSessionDto reschedule(Long id, PlannedSessionRescheduleRequest request) {
+        PlannedSession session = plannedSessionRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        session.setDate(request.date());
+        return toDto(plannedSessionRepository.save(session));
+    }
+
+    public PlannedSessionDto complete(Long id) {
+        PlannedSession session = plannedSessionRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        session.setCompleted(true);
+        return toDto(plannedSessionRepository.save(session));
+    }
+
+    public PlannedSessionDto incomplete(Long id) {
+        PlannedSession session = plannedSessionRepository.findById(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        session.setCompleted(false);
+        return toDto(plannedSessionRepository.save(session));
+    }
+
     private PlannedSessionDto toDto(PlannedSession session) {
         return new PlannedSessionDto(
             session.getId(),
