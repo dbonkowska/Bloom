@@ -8,6 +8,7 @@ import dbonkowska.bloom.backend.workout.author.AuthorRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import static org.assertj.core.api.Assertions.assertThat;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.context.ImportTestcontainers;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -221,6 +222,102 @@ class ProgramIntegrationTest {
         return p;
     }
 
+    // --- POST /api/programs/{id}/cycles ---
+
+    @Test
+    void createCycle_generatesSessionsForWorkoutDays() throws Exception {
+        Program program = programRepository.save(programWithStructure(1, 0, 2));
+
+        mvc.perform(post("/api/programs/" + program.getId() + "/cycles")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"startDate":"2026-01-01"}
+                    """))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.startDate").value("2026-01-01"))
+            .andExpect(jsonPath("$.endDate").value("2026-01-03"));
+
+        var sessions = plannedSessionRepository.findAll();
+        assertThat(sessions).hasSize(3);
+        assertThat(sessions.stream().filter(s -> s.getDate().equals(LocalDate.of(2026, 1, 1))).count()).isEqualTo(1);
+        assertThat(sessions.stream().filter(s -> s.getDate().equals(LocalDate.of(2026, 1, 2))).count()).isZero();
+        assertThat(sessions.stream().filter(s -> s.getDate().equals(LocalDate.of(2026, 1, 3))).count()).isEqualTo(2);
+        assertThat(sessions).allMatch(s -> s.getProgramCycle() != null && s.getProgramWorkout() != null);
+    }
+
+    @Test
+    void createCycle_restDaysGenerateNoSessions() throws Exception {
+        Program program = programRepository.save(programWithStructure(0));
+
+        mvc.perform(post("/api/programs/" + program.getId() + "/cycles")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"startDate":"2026-06-01"}
+                    """))
+            .andExpect(status().isCreated());
+
+        assertThat(plannedSessionRepository.count()).isZero();
+    }
+
+    @Test
+    void createCycle_duplicateStartDate_returns409() throws Exception {
+        Program program = programRepository.save(programWithDays("Plan A", 1));
+        programCycleRepository.save(cycle(program, LocalDate.of(2026, 1, 1)));
+
+        mvc.perform(post("/api/programs/" + program.getId() + "/cycles")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"startDate":"2026-01-01"}
+                    """))
+            .andExpect(status().isConflict());
+    }
+
+    // --- GET /api/programs/{id}/cycles ---
+
+    @Test
+    void listCycles_returnsAllForProgram() throws Exception {
+        Program program = programRepository.save(programWithDays("Plan A", 1));
+        programCycleRepository.save(cycle(program, LocalDate.of(2026, 1, 1)));
+        programCycleRepository.save(cycle(program, LocalDate.of(2026, 2, 1)));
+
+        mvc.perform(get("/api/programs/" + program.getId() + "/cycles"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    // --- GET /api/program-cycles/{id} ---
+
+    @Test
+    void getCycle_unknownId_returns404() throws Exception {
+        mvc.perform(get("/api/program-cycles/999"))
+            .andExpect(status().isNotFound());
+    }
+
+    // --- DELETE /api/program-cycles/{id} ---
+
+    @Test
+    void deleteCycle_cascadesToPlannedSessions() throws Exception {
+        Program program = programRepository.save(programWithDays("Plan A", 1));
+        ProgramCycle savedCycle = programCycleRepository.save(cycle(program, LocalDate.of(2026, 1, 1)));
+
+        PlannedSession s1 = new PlannedSession();
+        s1.setDate(LocalDate.of(2026, 1, 1));
+        s1.setWorkout(defaultWorkout);
+        s1.setProgramCycle(savedCycle);
+        s1.setCompleted(false);
+        PlannedSession s2 = new PlannedSession();
+        s2.setDate(LocalDate.of(2026, 1, 2));
+        s2.setWorkout(defaultWorkout);
+        s2.setProgramCycle(savedCycle);
+        s2.setCompleted(false);
+        plannedSessionRepository.saveAll(List.of(s1, s2));
+
+        mvc.perform(delete("/api/program-cycles/" + savedCycle.getId()))
+            .andExpect(status().isNoContent());
+
+        assertThat(plannedSessionRepository.count()).isZero();
+    }
+
     private Workout workout(String name) {
         Workout w = new Workout();
         w.setName(name);
@@ -242,5 +339,35 @@ class ProgramIntegrationTest {
         day.setWorkouts(List.of(pw));
         p.setDays(List.of(day));
         return p;
+    }
+
+    private Program programWithStructure(int... workoutsPerDay) {
+        Program p = new Program();
+        p.setName("Test Program");
+        List<ProgramDay> days = new ArrayList<>();
+        for (int i = 0; i < workoutsPerDay.length; i++) {
+            ProgramDay day = new ProgramDay();
+            day.setDayNumber(i + 1);
+            day.setProgram(p);
+            List<ProgramWorkout> workouts = new ArrayList<>();
+            for (int j = 0; j < workoutsPerDay[i]; j++) {
+                ProgramWorkout pw = new ProgramWorkout();
+                pw.setProgramDay(day);
+                pw.setWorkout(defaultWorkout);
+                pw.setOrder(j + 1);
+                workouts.add(pw);
+            }
+            day.setWorkouts(workouts);
+            days.add(day);
+        }
+        p.setDays(days);
+        return p;
+    }
+
+    private ProgramCycle cycle(Program program, LocalDate startDate) {
+        ProgramCycle c = new ProgramCycle();
+        c.setProgram(program);
+        c.setStartDate(startDate);
+        return c;
     }
 }
