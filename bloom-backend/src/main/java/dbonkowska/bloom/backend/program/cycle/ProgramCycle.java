@@ -1,5 +1,6 @@
-package dbonkowska.bloom.backend.program;
+package dbonkowska.bloom.backend.program.cycle;
 
+import dbonkowska.bloom.backend.program.Program;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 

@@ -1,4 +1,6 @@
-package dbonkowska.bloom.backend.program;
+package dbonkowska.bloom.backend.program.session;
+
+import dbonkowska.bloom.backend.program.WorkoutSummaryDto;
 
 import java.time.LocalDate;
 

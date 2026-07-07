@@ -1,4 +1,4 @@
-package dbonkowska.bloom.backend.program;
+package dbonkowska.bloom.backend.program.session;
 
 import java.time.LocalDate;
 

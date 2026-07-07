@@ -1,5 +1,6 @@
 package dbonkowska.bloom.backend.program;
 
+import dbonkowska.bloom.backend.program.cycle.ProgramCycleRepository;
 import dbonkowska.bloom.backend.workout.Workout;
 import dbonkowska.bloom.backend.workout.WorkoutRepository;
 import org.springframework.http.HttpStatus;

@@ -1,5 +1,11 @@
-package dbonkowska.bloom.backend.program;
+package dbonkowska.bloom.backend.program.cycle;
 
+import dbonkowska.bloom.backend.program.Program;
+import dbonkowska.bloom.backend.program.ProgramDay;
+import dbonkowska.bloom.backend.program.ProgramRepository;
+import dbonkowska.bloom.backend.program.ProgramWorkout;
+import dbonkowska.bloom.backend.program.session.PlannedSession;
+import dbonkowska.bloom.backend.program.session.PlannedSessionRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

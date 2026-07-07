@@ -1,5 +1,9 @@
 package dbonkowska.bloom.backend.program;
 
+import dbonkowska.bloom.backend.program.cycle.ProgramCycle;
+import dbonkowska.bloom.backend.program.cycle.ProgramCycleRepository;
+import dbonkowska.bloom.backend.program.session.PlannedSession;
+import dbonkowska.bloom.backend.program.session.PlannedSessionRepository;
 import dbonkowska.bloom.backend.workout.MuscleGroup;
 import dbonkowska.bloom.backend.workout.Workout;
 import dbonkowska.bloom.backend.workout.WorkoutRepository;
@@ -316,6 +320,111 @@ class ProgramIntegrationTest {
             .andExpect(status().isNoContent());
 
         assertThat(plannedSessionRepository.count()).isZero();
+    }
+
+    // --- POST /api/planned-sessions ---
+
+    @Test
+    void createPlannedSession_adHoc_returns201() throws Exception {
+        mvc.perform(post("/api/planned-sessions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"date":"2026-03-10","workoutId":%d}
+                    """.formatted(defaultWorkout.getId())))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.date").value("2026-03-10"))
+            .andExpect(jsonPath("$.workout.name").value(defaultWorkout.getName()))
+            .andExpect(jsonPath("$.programCycleId").value(org.hamcrest.Matchers.nullValue()))
+            .andExpect(jsonPath("$.programWorkoutId").value(org.hamcrest.Matchers.nullValue()))
+            .andExpect(jsonPath("$.completed").value(false));
+    }
+
+    @Test
+    void createPlannedSession_withProgramCycleId_returns201() throws Exception {
+        Program program = programRepository.save(programWithDays("Plan A", 1));
+        ProgramCycle savedCycle = programCycleRepository.save(cycle(program, LocalDate.of(2026, 1, 1)));
+
+        mvc.perform(post("/api/planned-sessions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"date":"2026-03-10","workoutId":%d,"programCycleId":%d}
+                    """.formatted(defaultWorkout.getId(), savedCycle.getId())))
+            .andExpect(status().isCreated())
+            .andExpect(jsonPath("$.programCycleId").value(savedCycle.getId().intValue()));
+    }
+
+    @Test
+    void createPlannedSession_unknownWorkoutId_returns400() throws Exception {
+        mvc.perform(post("/api/planned-sessions")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"date":"2026-03-10","workoutId":999}
+                    """))
+            .andExpect(status().isBadRequest());
+    }
+
+    // --- GET /api/planned-sessions ---
+
+    @Test
+    void listPlannedSessions_withDateRange_returnsFiltered() throws Exception {
+        plannedSessionRepository.saveAll(List.of(
+            session(LocalDate.of(2026, 1, 1)),
+            session(LocalDate.of(2026, 1, 15)),
+            session(LocalDate.of(2026, 2, 1))
+        ));
+
+        mvc.perform(get("/api/planned-sessions")
+                .param("from", "2026-01-01")
+                .param("to", "2026-01-31"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    @Test
+    void listPlannedSessions_noParams_returnsAll() throws Exception {
+        plannedSessionRepository.saveAll(List.of(
+            session(LocalDate.of(2026, 1, 1)),
+            session(LocalDate.of(2026, 2, 1))
+        ));
+
+        mvc.perform(get("/api/planned-sessions"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(2)));
+    }
+
+    // --- GET /api/planned-sessions/{id} ---
+
+    @Test
+    void getPlannedSession_unknownId_returns404() throws Exception {
+        mvc.perform(get("/api/planned-sessions/999"))
+            .andExpect(status().isNotFound());
+    }
+
+    // --- DELETE /api/planned-sessions/{id} ---
+
+    @Test
+    void deletePlannedSession_returns204() throws Exception {
+        PlannedSession saved = plannedSessionRepository.save(session(LocalDate.of(2026, 1, 1)));
+
+        mvc.perform(delete("/api/planned-sessions/" + saved.getId()))
+            .andExpect(status().isNoContent());
+
+        mvc.perform(get("/api/planned-sessions/" + saved.getId()))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deletePlannedSession_unknownId_returns404() throws Exception {
+        mvc.perform(delete("/api/planned-sessions/999"))
+            .andExpect(status().isNotFound());
+    }
+
+    private PlannedSession session(LocalDate date) {
+        PlannedSession s = new PlannedSession();
+        s.setDate(date);
+        s.setWorkout(defaultWorkout);
+        s.setCompleted(false);
+        return s;
     }
 
     private Workout workout(String name) {

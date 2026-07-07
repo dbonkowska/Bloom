@@ -1,4 +1,4 @@
-package dbonkowska.bloom.backend.program;
+package dbonkowska.bloom.backend.program.cycle;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

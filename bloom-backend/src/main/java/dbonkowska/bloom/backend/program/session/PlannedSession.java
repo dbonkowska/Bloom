@@ -1,5 +1,7 @@
-package dbonkowska.bloom.backend.program;
+package dbonkowska.bloom.backend.program.session;
 
+import dbonkowska.bloom.backend.program.ProgramWorkout;
+import dbonkowska.bloom.backend.program.cycle.ProgramCycle;
 import dbonkowska.bloom.backend.workout.Workout;
 import jakarta.persistence.*;
 import java.time.LocalDate;
