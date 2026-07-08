@@ -1,9 +1,9 @@
 package dbonkowska.bloom.backend.program.cycle;
 
 import dbonkowska.bloom.backend.program.Program;
-import dbonkowska.bloom.backend.program.ProgramDay;
 import dbonkowska.bloom.backend.program.ProgramRepository;
-import dbonkowska.bloom.backend.program.ProgramWorkout;
+import dbonkowska.bloom.backend.program.day.ProgramDay;
+import dbonkowska.bloom.backend.program.workout.ProgramWorkout;
 import dbonkowska.bloom.backend.program.session.PlannedSession;
 import dbonkowska.bloom.backend.program.session.PlannedSessionRepository;
 import org.springframework.http.HttpStatus;
@@ -30,6 +30,7 @@ public class ProgramCycleService {
         this.plannedSessionRepository = plannedSessionRepository;
     }
 
+    @Transactional
     public ProgramCycleDto create(Long programId, ProgramCycleRequest request) {
         Program program = programRepository.findById(programId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -88,6 +89,6 @@ public class ProgramCycleService {
         LocalDate endDate = numDays > 0
             ? cycle.getStartDate().plusDays(numDays - 1)
             : cycle.getStartDate();
-        return new ProgramCycleDto(cycle.getId(), cycle.getProgram().getId(), cycle.getStartDate(), endDate);
+        return new ProgramCycleDto(cycle.getId(), cycle.getProgram().getId(), cycle.getProgram().getName(), cycle.getStartDate(), endDate);
     }
 }

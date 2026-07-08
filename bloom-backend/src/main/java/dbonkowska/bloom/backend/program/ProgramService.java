@@ -1,6 +1,12 @@
 package dbonkowska.bloom.backend.program;
 
 import dbonkowska.bloom.backend.program.cycle.ProgramCycleRepository;
+import dbonkowska.bloom.backend.program.day.ProgramDay;
+import dbonkowska.bloom.backend.program.day.ProgramDayDto;
+import dbonkowska.bloom.backend.program.day.ProgramDayRequest;
+import dbonkowska.bloom.backend.program.workout.ProgramWorkout;
+import dbonkowska.bloom.backend.program.workout.ProgramWorkoutDto;
+import dbonkowska.bloom.backend.program.workout.ProgramWorkoutRequest;
 import dbonkowska.bloom.backend.workout.Workout;
 import dbonkowska.bloom.backend.workout.WorkoutRepository;
 import org.springframework.http.HttpStatus;
@@ -100,7 +106,8 @@ public class ProgramService {
         List<ProgramWorkoutDto> workoutDtos = day.getWorkouts().stream()
             .map(pw -> new ProgramWorkoutDto(
                 pw.getId(),
-                new WorkoutSummaryDto(pw.getWorkout().getId(), pw.getWorkout().getName())
+                new WorkoutSummaryDto(pw.getWorkout().getId(), pw.getWorkout().getName()),
+                pw.getOrder()
             ))
             .toList();
         return new ProgramDayDto(day.getId(), day.getDayNumber(), workoutDtos);

@@ -2,6 +2,8 @@ package dbonkowska.bloom.backend.program;
 
 import dbonkowska.bloom.backend.program.cycle.ProgramCycle;
 import dbonkowska.bloom.backend.program.cycle.ProgramCycleRepository;
+import dbonkowska.bloom.backend.program.day.ProgramDay;
+import dbonkowska.bloom.backend.program.workout.ProgramWorkout;
 import dbonkowska.bloom.backend.program.session.PlannedSession;
 import dbonkowska.bloom.backend.program.session.PlannedSessionRepository;
 import dbonkowska.bloom.backend.workout.MuscleGroup;
@@ -84,6 +86,7 @@ class ProgramIntegrationTest {
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.days", hasSize(2)))
             .andExpect(jsonPath("$.days[0].workouts[0].workout.name").value(defaultWorkout.getName()))
+            .andExpect(jsonPath("$.days[0].workouts[0].order").value(1))
             .andExpect(jsonPath("$.days[1].workouts", hasSize(0)));
     }
 
@@ -138,7 +141,8 @@ class ProgramIntegrationTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(saved.getId()))
             .andExpect(jsonPath("$.days", hasSize(1)))
-            .andExpect(jsonPath("$.days[0].workouts[0].workout.name").value(defaultWorkout.getName()));
+            .andExpect(jsonPath("$.days[0].workouts[0].workout.name").value(defaultWorkout.getName()))
+            .andExpect(jsonPath("$.days[0].workouts[0].order").value(1));
     }
 
     @Test
@@ -239,7 +243,8 @@ class ProgramIntegrationTest {
                     """))
             .andExpect(status().isCreated())
             .andExpect(jsonPath("$.startDate").value("2026-01-01"))
-            .andExpect(jsonPath("$.endDate").value("2026-01-03"));
+            .andExpect(jsonPath("$.endDate").value("2026-01-03"))
+            .andExpect(jsonPath("$.programName").value("Test Program"));
 
         var sessions = plannedSessionRepository.findAll();
         assertThat(sessions).hasSize(3);
@@ -261,6 +266,16 @@ class ProgramIntegrationTest {
             .andExpect(status().isCreated());
 
         assertThat(plannedSessionRepository.count()).isZero();
+    }
+
+    @Test
+    void createCycle_missingStartDate_returns400() throws Exception {
+        Program program = programRepository.save(programWithDays("Plan A", 1));
+
+        mvc.perform(post("/api/programs/" + program.getId() + "/cycles")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+            .andExpect(status().isBadRequest());
     }
 
     @Test

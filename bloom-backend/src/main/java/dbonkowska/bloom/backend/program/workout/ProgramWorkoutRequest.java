@@ -1,3 +1,3 @@
-package dbonkowska.bloom.backend.program;
+package dbonkowska.bloom.backend.program.workout;
 
 public record ProgramWorkoutRequest(Long workoutId) {}

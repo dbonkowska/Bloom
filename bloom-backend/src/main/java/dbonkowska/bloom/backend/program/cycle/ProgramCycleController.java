@@ -1,5 +1,6 @@
 package dbonkowska.bloom.backend.program.cycle;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ public class ProgramCycleController {
 
     @PostMapping("/api/programs/{programId}/cycles")
     @ResponseStatus(HttpStatus.CREATED)
-    public ProgramCycleDto create(@PathVariable Long programId, @RequestBody ProgramCycleRequest request) {
+    public ProgramCycleDto create(@PathVariable Long programId, @Valid @RequestBody ProgramCycleRequest request) {
         return programCycleService.create(programId, request);
     }
 

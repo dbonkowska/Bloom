@@ -1,5 +1,6 @@
 package dbonkowska.bloom.backend.program;
 
+import dbonkowska.bloom.backend.program.day.ProgramDay;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;

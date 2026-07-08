@@ -1,5 +1,6 @@
-package dbonkowska.bloom.backend.program;
+package dbonkowska.bloom.backend.program.workout;
 
+import dbonkowska.bloom.backend.program.day.ProgramDay;
 import dbonkowska.bloom.backend.workout.Workout;
 import jakarta.persistence.*;
 

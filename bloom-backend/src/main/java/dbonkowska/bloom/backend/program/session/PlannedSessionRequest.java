@@ -6,6 +6,5 @@ import java.time.LocalDate;
 public record PlannedSessionRequest(
     @NotNull LocalDate date,
     @NotNull Long workoutId,
-    Long programCycleId,
-    Long programWorkoutId
+    Long programCycleId
 ) {}
