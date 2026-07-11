@@ -1,7 +1,6 @@
 package dbonkowska.bloom.backend.workout;
 
 import dbonkowska.bloom.backend.workout.author.Author;
-import dbonkowska.bloom.backend.workout.author.AuthorDto;
 import dbonkowska.bloom.backend.workout.author.AuthorRepository;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -25,7 +24,7 @@ public class WorkoutService {
         Author author = resolveAuthor(request.authorId());
         Workout workout = new Workout();
         applyRequest(workout, request, author);
-        return toDto(workoutRepository.save(workout));
+        return WorkoutDto.from(workoutRepository.save(workout));
     }
 
     public List<WorkoutDto> findAll(MuscleGroup muscleGroup, Long authorId, Integer minDuration, Integer maxDuration) {
@@ -34,12 +33,12 @@ public class WorkoutService {
         if (authorId != null) spec = spec.and(WorkoutSpecification.byAuthorId(authorId));
         if (minDuration != null) spec = spec.and(WorkoutSpecification.minDuration(minDuration));
         if (maxDuration != null) spec = spec.and(WorkoutSpecification.maxDuration(maxDuration));
-        return workoutRepository.findAll(spec).stream().map(this::toDto).toList();
+        return workoutRepository.findAll(spec).stream().map(WorkoutDto::from).toList();
     }
 
     public WorkoutDto findById(Long id) {
         return workoutRepository.findById(id)
-            .map(this::toDto)
+            .map(WorkoutDto::from)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
@@ -48,7 +47,7 @@ public class WorkoutService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         Author author = resolveAuthor(request.authorId());
         applyRequest(workout, request, author);
-        return toDto(workoutRepository.save(workout));
+        return WorkoutDto.from(workoutRepository.save(workout));
     }
 
     public void delete(Long id) {
@@ -70,18 +69,5 @@ public class WorkoutService {
         workout.setMuscleGroups(request.muscleGroups());
         workout.setNotes(request.notes());
         workout.setAuthor(author);
-    }
-
-    private WorkoutDto toDto(Workout workout) {
-        Author a = workout.getAuthor();
-        return new WorkoutDto(
-            workout.getId(),
-            workout.getName(),
-            workout.getYoutubeUrl(),
-            workout.getDurationMinutes(),
-            workout.getMuscleGroups(),
-            workout.getNotes(),
-            new AuthorDto(a.getId(), a.getName())
-        );
     }
 }

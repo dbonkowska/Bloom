@@ -59,20 +59,20 @@ public class ProgramCycleService {
         }
         plannedSessionRepository.saveAll(sessions);
 
-        return toDto(cycle);
+        return ProgramCycleDto.from(cycle);
     }
 
     public List<ProgramCycleDto> findAllByProgramId(Long programId) {
         Program program = programRepository.findById(programId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         return programCycleRepository.findAllByProgram(program).stream()
-            .map(this::toDto)
+            .map(ProgramCycleDto::from)
             .toList();
     }
 
     public ProgramCycleDto findById(Long id) {
         return programCycleRepository.findById(id)
-            .map(this::toDto)
+            .map(ProgramCycleDto::from)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
@@ -82,13 +82,5 @@ public class ProgramCycleService {
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         plannedSessionRepository.deleteAllByProgramCycle(cycle);
         programCycleRepository.deleteById(id);
-    }
-
-    private ProgramCycleDto toDto(ProgramCycle cycle) {
-        int numDays = cycle.getProgram().getDays().size();
-        LocalDate endDate = numDays > 0
-            ? cycle.getStartDate().plusDays(numDays - 1)
-            : cycle.getStartDate();
-        return new ProgramCycleDto(cycle.getId(), cycle.getProgram().getId(), cycle.getProgram().getName(), cycle.getStartDate(), endDate);
     }
 }

@@ -30,16 +30,16 @@ public class BodyMeasurementController {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "from must not be after to");
             }
             return repository.findByDateBetweenOrderByDateDesc(from, to).stream()
-                .map(this::toDto).toList();
+                .map(BodyMeasurementDto::from).toList();
         }
         return repository.findAllByOrderByDateDesc().stream()
-            .map(this::toDto).toList();
+            .map(BodyMeasurementDto::from).toList();
     }
 
     @GetMapping("/{id}")
     public BodyMeasurementDto getById(@PathVariable Long id) {
         return repository.findById(id)
-            .map(this::toDto)
+            .map(BodyMeasurementDto::from)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
@@ -47,7 +47,7 @@ public class BodyMeasurementController {
     @ResponseStatus(HttpStatus.CREATED)
     public BodyMeasurementDto create(@RequestBody @Valid BodyMeasurementDto dto) {
         try {
-            return toDto(repository.save(toEntity(dto)));
+            return BodyMeasurementDto.from(repository.save(toEntity(dto)));
         } catch (DataIntegrityViolationException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "A measurement for this date already exists");
         }
@@ -77,7 +77,7 @@ public class BodyMeasurementController {
         entity.setCalfLeft(dto.calfLeft());
         entity.setCalfRight(dto.calfRight());
         try {
-            return toDto(repository.save(entity));
+            return BodyMeasurementDto.from(repository.save(entity));
         } catch (DataIntegrityViolationException e) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "A measurement for this date already exists");
         }
@@ -90,18 +90,6 @@ public class BodyMeasurementController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
         repository.deleteById(id);
-    }
-
-    private BodyMeasurementDto toDto(BodyMeasurement m) {
-        return new BodyMeasurementDto(
-            m.getId(), m.getDate(),
-            m.getWeight(), m.getBodyFatPct(), m.getMuscleMass(), m.getWaterPct(), m.getBonesPct(), m.getBmi(),
-            m.getChest(), m.getWaist(), m.getStomach(), m.getHips(),
-            m.getForearmLeft(), m.getForearmRight(),
-            m.getArmLeft(), m.getArmRight(),
-            m.getThighLeft(), m.getThighRight(),
-            m.getCalfLeft(), m.getCalfRight()
-        );
     }
 
     private BodyMeasurement toEntity(BodyMeasurementDto dto) {

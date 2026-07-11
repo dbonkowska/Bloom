@@ -21,16 +21,16 @@ public class AuthorService {
     public AuthorDto create(String name) {
         Author author = new Author();
         author.setName(name);
-        return toDto(authorRepository.save(author));
+        return AuthorDto.from(authorRepository.save(author));
     }
 
     public List<AuthorDto> findAll() {
-        return authorRepository.findAll().stream().map(this::toDto).toList();
+        return authorRepository.findAll().stream().map(AuthorDto::from).toList();
     }
 
     public AuthorDto findById(Long id) {
         return authorRepository.findById(id)
-            .map(this::toDto)
+            .map(AuthorDto::from)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
@@ -38,7 +38,7 @@ public class AuthorService {
         Author author = authorRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         author.setName(name);
-        return toDto(authorRepository.save(author));
+        return AuthorDto.from(authorRepository.save(author));
     }
 
     public void delete(Long id) {
@@ -48,9 +48,5 @@ public class AuthorService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Author has associated workouts");
         }
         authorRepository.deleteById(id);
-    }
-
-    private AuthorDto toDto(Author author) {
-        return new AuthorDto(author.getId(), author.getName());
     }
 }
