@@ -38,17 +38,19 @@ public class CalendarService {
 
         TreeMap<LocalDate, Bucket> buckets = new TreeMap<>();
         for (Session s : sessions) {
-            buckets.computeIfAbsent(s.getDate().toLocalDate(), d -> new Bucket()).actual.add(s);
+            buckets.computeIfAbsent(s.getDate().toLocalDate(), _ -> new Bucket()).actual.add(s);
         }
         for (PlannedSession p : plannedSessions) {
-            buckets.computeIfAbsent(p.getDate(), d -> new Bucket()).planned.add(p);
+            buckets.computeIfAbsent(p.getDate(), _ -> new Bucket()).planned.add(p);
         }
 
         List<CalendarDayDto> result = new ArrayList<>();
         for (var entry : buckets.entrySet()) {
             Bucket bucket = entry.getValue();
             bucket.actual.sort(Comparator.comparing(Session::getDate));
-            bucket.planned.sort(Comparator.comparing(PlannedSession::getId));
+            bucket.planned.sort(Comparator
+                .comparing((PlannedSession p) -> p.getProgramWorkout() != null ? p.getProgramWorkout().getOrder() : Integer.MAX_VALUE)
+                .thenComparing(PlannedSession::getId));
             List<SessionDto> actual = bucket.actual.stream().map(SessionDto::from).toList();
             List<PlannedSessionDto> planned = bucket.planned.stream().map(PlannedSessionDto::from).toList();
             result.add(new CalendarDayDto(entry.getKey(), actual, planned));
