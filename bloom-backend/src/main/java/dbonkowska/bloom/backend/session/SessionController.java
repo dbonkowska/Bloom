@@ -35,25 +35,11 @@ public class SessionController {
         List<Session> sessions = (from != null && to != null)
             ? repository.findByDateBetween(from, to)
             : repository.findAll();
-        return sessions.stream().map(this::toDto).toList();
+        return sessions.stream().map(SessionDto::from).toList();
     }
 
     @PostMapping("/import")
     public GarminImportResultDto importCsv(@RequestParam("file") MultipartFile file) throws IOException {
         return importService.importCsv(file.getInputStream());
-    }
-
-    private SessionDto toDto(Session s) {
-        return new SessionDto(
-            s.getId(),
-            s.getDate(),
-            s.getType(),
-            s.getTitle(),
-            Math.toIntExact(s.getDuration().getSeconds()),
-            s.getDistance(),
-            s.getAvgHeartRate(),
-            s.getMaxHeartRate(),
-            s.getCalories()
-        );
     }
 }

@@ -2,10 +2,8 @@ package dbonkowska.bloom.backend.program;
 
 import dbonkowska.bloom.backend.program.cycle.ProgramCycleRepository;
 import dbonkowska.bloom.backend.program.day.ProgramDay;
-import dbonkowska.bloom.backend.program.day.ProgramDayDto;
 import dbonkowska.bloom.backend.program.day.ProgramDayRequest;
 import dbonkowska.bloom.backend.program.workout.ProgramWorkout;
-import dbonkowska.bloom.backend.program.workout.ProgramWorkoutDto;
 import dbonkowska.bloom.backend.program.workout.ProgramWorkoutRequest;
 import dbonkowska.bloom.backend.workout.Workout;
 import dbonkowska.bloom.backend.workout.WorkoutRepository;
@@ -32,18 +30,18 @@ public class ProgramService {
     public ProgramDto create(ProgramRequest request) {
         Program program = new Program();
         applyRequest(program, request);
-        return toDto(programRepository.save(program));
+        return ProgramDto.from(programRepository.save(program));
     }
 
     public List<ProgramSummaryDto> findAll() {
         return programRepository.findAll().stream()
-            .map(p -> new ProgramSummaryDto(p.getId(), p.getName(), p.getDescription(), p.getDays().size()))
+            .map(ProgramSummaryDto::from)
             .toList();
     }
 
     public ProgramDto findById(Long id) {
         return programRepository.findById(id)
-            .map(this::toDto)
+            .map(ProgramDto::from)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
@@ -51,7 +49,7 @@ public class ProgramService {
         Program program = programRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         applyRequest(program, request);
-        return toDto(programRepository.save(program));
+        return ProgramDto.from(programRepository.save(program));
     }
 
     public void delete(Long id) {
@@ -93,23 +91,5 @@ public class ProgramService {
             workouts.add(pw);
         }
         return workouts;
-    }
-
-    private ProgramDto toDto(Program program) {
-        List<ProgramDayDto> dayDtos = program.getDays().stream()
-            .map(this::toDayDto)
-            .toList();
-        return new ProgramDto(program.getId(), program.getName(), program.getDescription(), dayDtos);
-    }
-
-    private ProgramDayDto toDayDto(ProgramDay day) {
-        List<ProgramWorkoutDto> workoutDtos = day.getWorkouts().stream()
-            .map(pw -> new ProgramWorkoutDto(
-                pw.getId(),
-                new WorkoutSummaryDto(pw.getWorkout().getId(), pw.getWorkout().getName()),
-                pw.getOrder()
-            ))
-            .toList();
-        return new ProgramDayDto(day.getId(), day.getDayNumber(), workoutDtos);
     }
 }

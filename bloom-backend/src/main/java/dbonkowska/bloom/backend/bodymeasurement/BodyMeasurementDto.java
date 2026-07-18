@@ -27,4 +27,17 @@ public record BodyMeasurementDto(
     @Positive Double thighRight,
     @Positive Double calfLeft,
     @Positive Double calfRight
-) {}
+) {
+
+    public static BodyMeasurementDto from(BodyMeasurement m) {
+        return new BodyMeasurementDto(
+            m.getId(), m.getDate(),
+            m.getWeight(), m.getBodyFatPct(), m.getMuscleMass(), m.getWaterPct(), m.getBonesPct(), m.getBmi(),
+            m.getChest(), m.getWaist(), m.getStomach(), m.getHips(),
+            m.getForearmLeft(), m.getForearmRight(),
+            m.getArmLeft(), m.getArmRight(),
+            m.getThighLeft(), m.getThighRight(),
+            m.getCalfLeft(), m.getCalfRight()
+        );
+    }
+}

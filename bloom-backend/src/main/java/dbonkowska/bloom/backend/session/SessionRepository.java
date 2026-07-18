@@ -7,4 +7,7 @@ import java.util.List;
 public interface SessionRepository extends JpaRepository<Session, Long> {
     List<Session> findByDateBetween(LocalDateTime from, LocalDateTime to);
     boolean existsByDateAndType(LocalDateTime date, SessionType type);
+    List<Session> findByDateGreaterThanEqualAndDateLessThan(LocalDateTime from, LocalDateTime to);
+    List<Session> findByDateGreaterThanEqual(LocalDateTime from);
+    List<Session> findByDateLessThan(LocalDateTime to);
 }

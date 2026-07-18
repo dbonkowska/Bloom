@@ -1,6 +1,5 @@
 package dbonkowska.bloom.backend.program.session;
 
-import dbonkowska.bloom.backend.program.WorkoutSummaryDto;
 import dbonkowska.bloom.backend.program.cycle.ProgramCycle;
 import dbonkowska.bloom.backend.program.cycle.ProgramCycleRepository;
 import dbonkowska.bloom.backend.workout.Workout;
@@ -43,7 +42,7 @@ public class PlannedSessionService {
         session.setProgramCycle(programCycle);
         session.setCompleted(false);
 
-        return toDto(plannedSessionRepository.save(session));
+        return PlannedSessionDto.from(plannedSessionRepository.save(session));
     }
 
     public List<PlannedSessionDto> findAll(LocalDate from, LocalDate to) {
@@ -57,12 +56,12 @@ public class PlannedSessionService {
         } else {
             sessions = plannedSessionRepository.findAll();
         }
-        return sessions.stream().map(this::toDto).toList();
+        return sessions.stream().map(PlannedSessionDto::from).toList();
     }
 
     public PlannedSessionDto findById(Long id) {
         return plannedSessionRepository.findById(id)
-            .map(this::toDto)
+            .map(PlannedSessionDto::from)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
@@ -77,31 +76,20 @@ public class PlannedSessionService {
         PlannedSession session = plannedSessionRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         session.setDate(request.date());
-        return toDto(plannedSessionRepository.save(session));
+        return PlannedSessionDto.from(plannedSessionRepository.save(session));
     }
 
     public PlannedSessionDto complete(Long id) {
         PlannedSession session = plannedSessionRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         session.setCompleted(true);
-        return toDto(plannedSessionRepository.save(session));
+        return PlannedSessionDto.from(plannedSessionRepository.save(session));
     }
 
     public PlannedSessionDto incomplete(Long id) {
         PlannedSession session = plannedSessionRepository.findById(id)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         session.setCompleted(false);
-        return toDto(plannedSessionRepository.save(session));
-    }
-
-    private PlannedSessionDto toDto(PlannedSession session) {
-        return new PlannedSessionDto(
-            session.getId(),
-            session.getDate(),
-            new WorkoutSummaryDto(session.getWorkout().getId(), session.getWorkout().getName()),
-            session.getProgramCycle() != null ? session.getProgramCycle().getId() : null,
-            session.getProgramWorkout() != null ? session.getProgramWorkout().getId() : null,
-            session.isCompleted()
-        );
+        return PlannedSessionDto.from(plannedSessionRepository.save(session));
     }
 }

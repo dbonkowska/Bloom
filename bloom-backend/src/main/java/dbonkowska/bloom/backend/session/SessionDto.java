@@ -12,4 +12,19 @@ public record SessionDto(
     Integer avgHeartRate,
     Integer maxHeartRate,
     Integer calories
-) {}
+) {
+
+    public static SessionDto from(Session s) {
+        return new SessionDto(
+            s.getId(),
+            s.getDate(),
+            s.getType(),
+            s.getTitle(),
+            Math.toIntExact(s.getDuration().getSeconds()),
+            s.getDistance(),
+            s.getAvgHeartRate(),
+            s.getMaxHeartRate(),
+            s.getCalories()
+        );
+    }
+}
