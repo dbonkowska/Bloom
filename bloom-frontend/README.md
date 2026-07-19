@@ -54,6 +54,24 @@ ng e2e
 
 Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
 
+## Generated API client
+
+`src/app/bloom-api/` is a **generated** TypeScript client for the Bloom backend, produced by
+[ng-openapi-gen](https://github.com/cyclosproject/ng-openapi-gen) from the backend's OpenAPI
+document at `http://localhost:8080/v3/api-docs`. The generated files are committed so the
+frontend builds without the backend running. Do not edit them by hand — changes are
+overwritten on the next generation.
+
+To regenerate, with the backend running (`docker compose up -d` + `mvnw spring-boot:run`):
+
+```bash
+npm run generate:api
+```
+
+`removeStaleFiles` is enabled, so endpoints removed from the backend are also removed here.
+The root URL is overridden to `''` in `src/app/app.config.ts` (`provideApiConfiguration('')`)
+so requests use relative paths through the dev proxy.
+
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
